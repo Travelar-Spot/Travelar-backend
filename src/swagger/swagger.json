@@ -1,0 +1,120 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Travelar API (PC1) - Conta",
+    "version": "1.0.0",
+    "description": "API para CRUD de Conta (US-01) - Travelar backend"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local"
+    }
+  ],
+  "paths": {
+    "/api/contas": {
+      "post": {
+        "summary": "Criar uma nova conta",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ContaInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Conta criada" },
+          "400": { "description": "Campos obrigatórios ausentes" },
+          "409": { "description": "CPF já cadastrado" }
+        }
+      },
+      "get": {
+        "summary": "Listar todas as contas",
+        "responses": {
+          "200": { "description": "Lista de contas" }
+        }
+      }
+    },
+    "/api/contas/{id}": {
+      "get": {
+        "summary": "Obter conta por id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Conta encontrada" },
+          "404": { "description": "Não encontrada" }
+        }
+      },
+      "put": {
+        "summary": "Atualizar conta",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ContaInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Conta atualizada" },
+          "404": { "description": "Não encontrada" }
+        }
+      },
+      "delete": {
+        "summary": "Excluir conta",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Removida com sucesso" },
+          "404": { "description": "Não encontrada" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ContaInput": {
+        "type": "object",
+        "required": ["nome", "cpf", "dataNascimento", "telefone"],
+        "properties": {
+          "nome": { "type": "string" },
+          "cpf": { "type": "string", "pattern": "^[0-9]{11}$" },
+          "dataNascimento": { "type": "string", "format": "date" },
+          "telefone": { "type": "string" }
+        }
+      },
+      "Conta": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ContaInput" },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "format": "uuid" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
