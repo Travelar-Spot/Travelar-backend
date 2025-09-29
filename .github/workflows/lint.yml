@@ -1,0 +1,31 @@
+name: Lint
+
+on:
+  push:
+    branches: [ main, pt_controle_1 ]
+  pull_request:
+    branches: [ main, pt_controle_1 ]
+
+jobs:
+  lint:
+    name: Run Prettier + ESLint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prettier
+        run: npm run lint
+
+      - name: Run ESLint
+        run: npm run lint:eslint
