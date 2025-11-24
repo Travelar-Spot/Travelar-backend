@@ -1,119 +1,366 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Travelar API (PC1) - Conta",
+    "title": "Travelar API",
     "version": "1.0.0",
-    "description": "API para CRUD de Conta (US-01) - Travelar backend"
+    "description": "API do projeto Travelar — Plataforma de aluguel de imóveis, permitindo cadastro de usuários, proprietários, clientes, reservas e avaliações."
   },
   "servers": [
     {
       "url": "http://localhost:3000",
-      "description": "Local"
+      "description": "Servidor local"
     }
   ],
+  "tags": [
+    { "name": "Usuários", "description": "Gerenciamento de usuários do sistema" },
+    { "name": "Imóveis", "description": "Gerenciamento e consulta de imóveis disponíveis" },
+    { "name": "Reservas", "description": "Criação e controle de reservas de hospedagem" },
+    { "name": "Avaliações", "description": "Avaliação de hospedagens por clientes" }
+  ],
   "paths": {
-    "/api/contas": {
+    "/usuarios": {
       "post": {
-        "summary": "Criar uma nova conta",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/ContaInput" }
-            }
-          }
-        },
+        "tags": ["Usuários"],
+        "summary": "Criar um novo usuário",
+        "requestBody": { "$ref": "#/components/requestBodies/UsuarioBody" },
         "responses": {
-          "201": { "description": "Conta criada" },
-          "400": { "description": "Campos obrigatórios ausentes" },
-          "409": { "description": "CPF já cadastrado" }
+          "201": { "description": "Usuário criado com sucesso" },
+          "400": { "description": "Dados inválidos" },
+          "409": { "description": "Email já cadastrado" }
         }
       },
       "get": {
-        "summary": "Listar todas as contas",
-        "responses": {
-          "200": { "description": "Lista de contas" }
-        }
+        "tags": ["Usuários"],
+        "summary": "Listar todos os usuários",
+        "responses": { "200": { "description": "Lista de usuários retornada com sucesso" } }
       }
     },
-    "/api/contas/{id}": {
+    "/usuarios/{id}": {
       "get": {
-        "summary": "Obter conta por id",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
+        "tags": ["Usuários"],
+        "summary": "Buscar usuário por ID",
+        "parameters": [{ "$ref": "#/components/parameters/GenericId" }],
         "responses": {
-          "200": { "description": "Conta encontrada" },
-          "404": { "description": "Não encontrada" }
+          "200": { "description": "Usuário encontrado" },
+          "404": { "description": "Usuário não encontrado" }
         }
       },
       "put": {
-        "summary": "Atualizar conta",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/ContaInput" }
-            }
-          }
-        },
+        "tags": ["Usuários"],
+        "summary": "Atualizar dados do usuário",
+        "parameters": [{ "$ref": "#/components/parameters/GenericId" }],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": { "$ref": "#/components/requestBodies/UsuarioBody" },
         "responses": {
-          "200": { "description": "Conta atualizada" },
-          "404": { "description": "Não encontrada" }
+          "200": { "description": "Usuário atualizado com sucesso" },
+          "404": { "description": "Usuário não encontrado" },
+          "401": { "description": "Não autorizado" },
+          "403": { "description": "Proibido" }
         }
       },
       "delete": {
-        "summary": "Excluir conta",
+        "tags": ["Usuários"],
+        "summary": "Excluir usuário",
+        "parameters": [{ "$ref": "#/components/parameters/GenericId" }],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Usuário removido com sucesso" },
+          "404": { "description": "Usuário não encontrado" },
+          "401": { "description": "Não autorizado" },
+          "403": { "description": "Proibido" }
+        }
+      }
+    },
+    "/imoveis": {
+      "post": {
+        "tags": ["Imóveis"],
+        "summary": "Cadastrar um novo imóvel",
+        "requestBody": { "$ref": "#/components/requestBodies/ImovelBody" },
+        "responses": {
+          "201": { "description": "Imóvel cadastrado com sucesso" },
+          "400": { "description": "Dados inválidos" }
+        }
+      },
+      "get": {
+        "tags": ["Imóveis"],
+        "summary": "Listar imóveis com filtros opcionais",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
+            "name": "tipo",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filtra por tipo (CASA, APARTAMENTO)"
+          },
+          {
+            "name": "cidade",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filtra por cidade"
+          },
+          {
+            "name": "capacidade",
+            "in": "query",
+            "schema": { "type": "integer" },
+            "description": "Filtra por capacidade mínima"
+          },
+          {
+            "name": "minPreco",
+            "in": "query",
+            "schema": { "type": "number" },
+            "description": "Preço mínimo da diária"
+          },
+          {
+            "name": "maxPreco",
+            "in": "query",
+            "schema": { "type": "number" },
+            "description": "Preço máximo da diária"
           }
         ],
+        "responses": { "200": { "description": "Lista de imóveis retornada" } }
+      }
+    },
+    "/imoveis/{id}": {
+      "get": {
+        "tags": ["Imóveis"],
+        "summary": "Buscar imóvel por ID",
+        "parameters": [{ "$ref": "#/components/parameters/GenericId" }],
         "responses": {
-          "204": { "description": "Removida com sucesso" },
-          "404": { "description": "Não encontrada" }
+          "200": { "description": "Imóvel encontrado" },
+          "404": { "description": "Imóvel não encontrado" }
+        }
+      },
+      "put": {
+        "tags": ["Imóveis"],
+        "summary": "Atualizar um imóvel",
+        "parameters": [{ "$ref": "#/components/parameters/GenericId" }],
+        "requestBody": { "$ref": "#/components/requestBodies/ImovelBody" },
+        "responses": {
+          "200": { "description": "Imóvel atualizado com sucesso" },
+          "404": { "description": "Imóvel não encontrado" }
+        }
+      },
+      "delete": {
+        "tags": ["Imóveis"],
+        "summary": "Excluir um imóvel",
+        "parameters": [{ "$ref": "#/components/parameters/GenericId" }],
+        "responses": {
+          "204": { "description": "Imóvel removido com sucesso" },
+          "404": { "description": "Imóvel não encontrado" }
+        }
+      }
+    },
+    "/reservas": {
+      "post": {
+        "tags": ["Reservas"],
+        "summary": "Criar uma nova reserva",
+        "requestBody": { "$ref": "#/components/requestBodies/ReservaBody" },
+        "responses": { "201": { "description": "Reserva criada com sucesso" } }
+      },
+      "get": {
+        "tags": ["Reservas"],
+        "summary": "Listar todas as reservas",
+        "responses": { "200": { "description": "Lista de reservas retornada" } }
+      }
+    },
+    "/reservas/{id}": {
+      "get": {
+        "tags": ["Reservas"],
+        "summary": "Buscar reserva por ID",
+        "parameters": [{ "$ref": "#/components/parameters/GenericId" }],
+        "responses": {
+          "200": { "description": "Reserva encontrada" },
+          "404": { "description": "Reserva não encontrada" }
+        }
+      },
+      "put": {
+        "tags": ["Reservas"],
+        "summary": "Modificar as datas de uma reserva",
+        "parameters": [{ "$ref": "#/components/parameters/GenericId" }],
+        "requestBody": { "$ref": "#/components/requestBodies/ReservaUpdateBody" },
+        "responses": {
+          "200": { "description": "Reserva modificada com sucesso" },
+          "400": { "description": "Dados inválidos" },
+          "404": { "description": "Reserva não encontrada" }
+        }
+      },
+      "delete": {
+        "tags": ["Reservas"],
+        "summary": "Excluir uma reserva",
+        "parameters": [{ "$ref": "#/components/parameters/GenericId" }],
+        "responses": {
+          "204": { "description": "Reserva excluída com sucesso" },
+          "404": { "description": "Reserva não encontrada" }
+        }
+      }
+    },
+    "/avaliacoes": {
+      "post": {
+        "tags": ["Avaliações"],
+        "summary": "Criar uma nova avaliação",
+        "requestBody": { "$ref": "#/components/requestBodies/AvaliacaoBody" },
+        "responses": {
+          "201": { "description": "Avaliação criada com sucesso" },
+          "400": { "description": "Dados inválidos ou usuário/imóvel inexistente" }
+        }
+      },
+      "get": {
+        "tags": ["Avaliações"],
+        "summary": "Listar todas as avaliações",
+        "responses": {
+          "200": { "description": "Lista de avaliações retornada com sucesso" }
+        }
+      }
+    },
+    "/avaliacoes/imovel/{imovelId}": {
+      "get": {
+        "tags": ["Avaliações"],
+        "summary": "Listar avaliações de um imóvel específico",
+        "parameters": [{ "$ref": "#/components/parameters/ImovelId" }],
+        "responses": {
+          "200": { "description": "Avaliações retornadas com sucesso" },
+          "404": { "description": "Imóvel não encontrado" }
+        }
+      }
+    },
+    "/avaliacoes/usuario/{autorId}": {
+      "get": {
+        "tags": ["Avaliações"],
+        "summary": "Listar avaliações feitas por um usuário específico",
+        "parameters": [{ "$ref": "#/components/parameters/AutorId" }],
+        "responses": {
+          "200": { "description": "Avaliações retornadas com sucesso" },
+          "404": { "description": "Usuário não encontrado" }
+        }
+      }
+    },
+    "/avaliacoes/{id}": {
+      "delete": {
+        "tags": ["Avaliações"],
+        "summary": "Excluir uma avaliação existente",
+        "parameters": [{ "$ref": "#/components/parameters/GenericId" }],
+        "responses": {
+          "204": { "description": "Avaliação excluída com sucesso" },
+          "404": { "description": "Avaliação não encontrada" }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "schemas": {
-      "ContaInput": {
+      "UsuarioInput": {
         "type": "object",
-        "required": ["nome", "cpf", "dataNascimento", "telefone"],
+        "required": ["nome", "email", "telefone"],
         "properties": {
           "nome": { "type": "string" },
-          "cpf": { "type": "string", "pattern": "^[0-9]{11}$" },
-          "dataNascimento": { "type": "string", "format": "date" },
-          "telefone": { "type": "string" }
+          "email": { "type": "string", "format": "email" },
+          "telefone": { "type": "string" },
+          "role": { "type": "string", "enum": ["CLIENTE", "PROPRIETARIO", "AMBOS"] }
         }
       },
-      "Conta": {
-        "allOf": [
-          { "$ref": "#/components/schemas/ContaInput" },
-          {
-            "type": "object",
-            "properties": {
-              "id": { "type": "string", "format": "uuid" }
-            }
-          }
-        ]
+      "ImovelInput": {
+        "type": "object",
+        "required": ["ownerId", "titulo", "descricao", "cidade", "precoPorNoite", "capacidade"],
+        "properties": {
+          "ownerId": { "type": "integer" },
+          "titulo": { "type": "string" },
+          "descricao": { "type": "string" },
+          "tipo": { "type": "string", "enum": ["CASA", "APARTAMENTO"] },
+          "endereco": { "type": "string" },
+          "cidade": { "type": "string" },
+          "precoPorNoite": { "type": "number" },
+          "capacidade": { "type": "integer" },
+          "disponivel": { "type": "boolean", "default": true }
+        }
+      },
+      "ReservaInput": {
+        "type": "object",
+        "required": ["clienteId", "imovelId", "dataInicio", "dataFim"],
+        "properties": {
+          "clienteId": { "type": "integer" },
+          "imovelId": { "type": "integer" },
+          "dataInicio": { "type": "string", "format": "date" },
+          "dataFim": { "type": "string", "format": "date" }
+        }
+      },
+      "ReservaUpdateInput": {
+        "type": "object",
+        "required": ["dataInicio", "dataFim"],
+        "properties": {
+          "dataInicio": { "type": "string", "format": "date" },
+          "dataFim": { "type": "string", "format": "date" }
+        }
+      },
+      "AvaliacaoInput": {
+        "type": "object",
+        "required": ["autorId", "imovelId", "nota", "comentario"],
+        "properties": {
+          "autorId": { "type": "integer" },
+          "imovelId": { "type": "integer" },
+          "nota": { "type": "integer", "minimum": 0, "maximum": 5 },
+          "comentario": { "type": "string" }
+        }
+      }
+    },
+    "parameters": {
+      "GenericId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "integer" },
+        "description": "ID do recurso"
+      },
+      "ImovelId": {
+        "name": "imovelId",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "integer" },
+        "description": "ID do imóvel"
+      },
+      "AutorId": {
+        "name": "autorId",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "integer" },
+        "description": "ID do autor (usuário)"
+      }
+    },
+    "requestBodies": {
+      "UsuarioBody": {
+        "required": true,
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/UsuarioInput" } }
+        }
+      },
+      "ImovelBody": {
+        "required": true,
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/ImovelInput" } }
+        }
+      },
+      "ReservaBody": {
+        "required": true,
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/ReservaInput" } }
+        }
+      },
+      "ReservaUpdateBody": {
+        "required": true,
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/ReservaUpdateInput" } }
+        }
+      },
+      "AvaliacaoBody": {
+        "required": true,
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/AvaliacaoInput" } }
+        }
       }
     }
   }
