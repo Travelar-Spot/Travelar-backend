@@ -14,7 +14,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'travelar-uploads', 
+    folder: 'travelar-uploads',
     allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
   } as any,
 });
