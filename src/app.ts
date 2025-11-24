@@ -16,6 +16,7 @@ const app = express();
 app.use(cors({ origin: config.corsOrigin }));
 app.use(express.json());
 app.use(passport.initialize());
+app.use(cors({ origin: '*' }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 app.use('/usuarios', rotasUsuario);
 app.use('/imoveis', rotasImoveis);
