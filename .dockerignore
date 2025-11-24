@@ -4,3 +4,8 @@ npm-debug.log
 dist
 .git
 .gitignore
+.env
+.env.test
+.env.dev
+.env.development
+dist
