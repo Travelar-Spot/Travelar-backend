@@ -1,17 +1,20 @@
-import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { ContaUsuario } from '../Contas/entity';
+import { config } from '../config/env.config';
+import { Usuario } from '../Usuario/entity';
+import { Imovel } from '../Imovel/entity';
+import { Reserva } from '../Reserva/entity';
+import { Avaliacao } from '../Avaliacao/entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT || 5432),
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-
-  synchronize: true,
+  host: config.database.host,
+  port: config.database.port,
+  username: config.database.username,
+  password: config.database.password,
+  database: config.database.name,
+  synchronize: config.nodeEnv === 'test' || config.nodeEnv === 'development',
   logging: false,
-  entities: [ContaUsuario],
+  entities: [Usuario, Imovel, Reserva, Avaliacao],
+  migrations: [],
+  subscribers: [],
 });

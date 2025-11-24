@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app:
+    
+    command: npx ts-node-dev --poll --respawn --transpile-only src/server.ts
+    
+    volumes:
+      
+      - .:/usr/src/app
+      
+      - /usr/src/app/node_modules
+    
+    environment:
+      - NODE_ENV=development
