@@ -1,26 +1,18 @@
-FROM node:18-alpine AS builder
+FROM node:18-alpine AS base
 
 WORKDIR /usr/src/app
 
-# Instalar dependências
+# Copy package definition first to leverage Docker cache
 COPY package*.json ./
-RUN npm ci --only=production
 
+# Install dependencies (Clean Install is safer, but 'install' is more flexible for dev)
+RUN npm install
+
+# Copy the rest of the application code
 COPY . .
 
-# Build (transpile TypeScript)
-RUN npm run build || true
-
-FROM node:18-alpine
-WORKDIR /usr/src/app
-
-ENV NODE_ENV=production
-
-# Copiar package.json para instalar deps de produção
-COPY package*.json ./
-RUN npm ci --only=production
-
-COPY --from=builder /usr/src/app/dist ./dist
-
 EXPOSE 3000
-CMD ["node", "dist/server.js"]
+
+# Use sh -c to ensure npm install runs before starting dev server
+# This fixes issues with volume sync on Windows where modules might be missing
+CMD sh -c "npm install && npm run dev"
