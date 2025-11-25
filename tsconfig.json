@@ -12,9 +12,14 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
     "node_modules",
-    "swagger.config.js"
+    "swagger.config.js",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/Testes/**/*"
   ]
 }
