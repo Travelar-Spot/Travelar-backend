@@ -12,7 +12,9 @@ export const AppDataSource = new DataSource({
   username: config.database.username,
   password: config.database.password,
   database: config.database.name,
-  synchronize: config.nodeEnv === 'test' || config.nodeEnv === 'development' || process.env.DB_SYNC === 'true',  logging: false,
+  synchronize:
+    config.nodeEnv === 'test' || config.nodeEnv === 'development' || process.env.DB_SYNC === 'true',
+  logging: false,
   entities: [Usuario, Imovel, Reserva, Avaliacao],
   migrations: [],
   subscribers: [],
