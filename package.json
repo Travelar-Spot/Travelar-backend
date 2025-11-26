@@ -7,6 +7,7 @@
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc && copyfiles -u 1 src/swagger/swagger.json dist",
     "start": "node dist/server.js",
+    "typeorm": "typeorm-ts-node-commonjs",
     "lint": "prettier --check \"src/**/*.{ts,js,json,md}\"",
     "lint:fix": "prettier --write \"src/**/*.{ts,js,json,md}\"",
     "lint:eslint": "eslint \"src/**/*.{ts,js}\"",

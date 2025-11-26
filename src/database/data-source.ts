@@ -4,9 +4,10 @@ import { Usuario } from '../Usuario/entity';
 import { Imovel } from '../Imovel/entity';
 import { Reserva } from '../Reserva/entity';
 import { Avaliacao } from '../Avaliacao/entity';
+import path from 'path';
 
-const isTest = config.nodeEnv === 'test';
 const isProduction = config.nodeEnv === 'production';
+const isTest = config.nodeEnv === 'test';
 
 const sslConfig = isTest
   ? false
@@ -16,10 +17,6 @@ const sslConfig = isTest
       ? { rejectUnauthorized: false }
       : false;
 
-if (!isTest) {
-  console.log(`[Database] Conectando ao banco: ${config.database.name}`);
-}
-
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: config.database.host,
@@ -27,11 +24,14 @@ export const AppDataSource = new DataSource({
   username: config.database.username,
   password: config.database.password,
   database: config.database.name,
-  dropSchema: isTest,
-  synchronize: isTest || config.nodeEnv === 'development',
+  synchronize: isTest,
   logging: false,
   entities: [Usuario, Imovel, Reserva, Avaliacao],
-  migrations: [],
+
+  migrations: [path.join(__dirname, '/../database/migrations/*.{ts,js}')],
+
+  migrationsRun: true,
+
   subscribers: [],
   ssl: sslConfig,
 });
