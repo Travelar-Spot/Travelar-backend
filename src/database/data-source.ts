@@ -5,6 +5,17 @@ import { Imovel } from '../Imovel/entity';
 import { Reserva } from '../Reserva/entity';
 import { Avaliacao } from '../Avaliacao/entity';
 
+const isTest = config.nodeEnv === 'test';
+const isProduction = config.nodeEnv === 'production';
+
+const sslConfig = isTest 
+  ? false 
+  : (config.database.ssl ? { rejectUnauthorized: false } : (isProduction ? { rejectUnauthorized: false } : false));
+
+if (!isTest) {
+    console.log(`[Database] Conectando ao banco: ${config.database.name}`);
+}
+
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: config.database.host,
@@ -12,13 +23,11 @@ export const AppDataSource = new DataSource({
   username: config.database.username,
   password: config.database.password,
   database: config.database.name,
-  synchronize:
-    config.nodeEnv === 'test' || config.nodeEnv === 'development' || process.env.DB_SYNC === 'true',
+  dropSchema: isTest, 
+  synchronize: isTest || config.nodeEnv === 'development',
   logging: false,
   entities: [Usuario, Imovel, Reserva, Avaliacao],
   migrations: [],
   subscribers: [],
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: sslConfig,
 });
