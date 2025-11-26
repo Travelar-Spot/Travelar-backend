@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class adicionar_foto_usuario implements MigrationInterface {
-  name = 'adicionar_foto_usuario';
+export class AdicionarFotoUsuario1764170773155 implements MigrationInterface {
+  name = 'AdicionarFotoUsuario1764170773155';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`ALTER TABLE "usuarios" ADD "foto" character varying`);
