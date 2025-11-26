@@ -8,12 +8,16 @@ import { Avaliacao } from '../Avaliacao/entity';
 const isTest = config.nodeEnv === 'test';
 const isProduction = config.nodeEnv === 'production';
 
-const sslConfig = isTest 
-  ? false 
-  : (config.database.ssl ? { rejectUnauthorized: false } : (isProduction ? { rejectUnauthorized: false } : false));
+const sslConfig = isTest
+  ? false
+  : config.database.ssl
+    ? { rejectUnauthorized: false }
+    : isProduction
+      ? { rejectUnauthorized: false }
+      : false;
 
 if (!isTest) {
-    console.log(`[Database] Conectando ao banco: ${config.database.name}`);
+  console.log(`[Database] Conectando ao banco: ${config.database.name}`);
 }
 
 export const AppDataSource = new DataSource({
@@ -23,7 +27,7 @@ export const AppDataSource = new DataSource({
   username: config.database.username,
   password: config.database.password,
   database: config.database.name,
-  dropSchema: isTest, 
+  dropSchema: isTest,
   synchronize: isTest || config.nodeEnv === 'development',
   logging: false,
   entities: [Usuario, Imovel, Reserva, Avaliacao],
