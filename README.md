@@ -1,113 +1,280 @@
+Aqui está um **README completo, extremamente organizado, padronizado e coerente**, seguindo toda a documentação fornecida.
+Você pode copiar e colar diretamente no repositório **Travelar-backend**.
 
+---
 
-Este repositório contém o backend do projeto Travelar, uma API REST para gerenciamento de contas e funcionalidades relacionadas a um sistema de aluguéis de imóveis por temporada.
+# **Travelar Backend**
 
-## Tecnologias
+## **1. Visão Geral do Projeto**
 
-Node.js
-TypeScript
-Express.js
-PostgreSQL
-TypeORM
-Docker & Docker Compose
-Swagger/OpenAPI
+O **Travelar Backend** é o núcleo responsável por todas as regras de negócio da plataforma Travelar.
+Diferentemente da API de Autenticação, este serviço gerencia todo o domínio principal de hospedagem: **Imóveis, Reservas, Avaliações e Upload de Imagens**.
 
-## Visão geral da arquitetura
+O projeto foi desenvolvido com foco em **robustez, escalabilidade e testabilidade**, integrando serviços externos como **Cloudinary**, e utilizando **Docker** para garantir portabilidade e facilidade de execução.
 
-```plaintext
-Travelar-Backend/
-├── src/
-│   ├── Contas/
-│   │   ├── controller.ts
-│   │   ├── entity.ts
-│   │   ├── routes.ts
-│   │   └── service.ts
-│   ├── database/
-│   │   └── data-source.ts
-│   ├── app.ts
-│   └── server.ts
-├── .env.example
-├── .gitignore
-├── docker-compose.yml
-├── Dockerfile
-├── package.json
-├── README.md
-├── swagger.config.js
-└── tsconfig.json
+### **Principais Responsabilidades**
+
+* CRUD completo de Imóveis e controle de disponibilidade
+* Processamento de Reservas (Check-in, Check-out, cancelamento e gerenciamento)
+* Sistema de Avaliações e Comentários
+* Upload de imagens via Cloudinary
+* Documentação automática com Swagger
+* Estrutura modular orientada a domínios
+
+---
+
+## **2. Tecnologias Utilizadas**
+
+A stack foi definida para garantir organização, consistência e alta qualidade.
+
+| Tecnologia                  | Categoria      | Uso                                              |
+| --------------------------- | -------------- | ------------------------------------------------ |
+| **Node.js + TypeScript**    | Core           | Base do backend e regras de negócio              |
+| **TypeORM**                 | ORM            | Mapeamento de entidades e relações complexas     |
+| **PostgreSQL**              | Banco de Dados | Persistência relacional                          |
+| **Jest**                    | Testes         | Testes unitários, parametrizados e de integração |
+| **Swagger**                 | Documentação   | Documentação interativa da API                   |
+| **Docker + Docker Compose** | Infraestrutura | Containerização da aplicação e banco             |
+| **Cloudinary**              | Mídia          | Upload, otimização e entrega de imagens          |
+
+---
+
+## **3. Estrutura de Pastas e Arquitetura**
+
+A arquitetura segue uma divisão por **domínios/módulos**, garantindo organização e independência entre contextos.
+
 ```
-## Estrutura de endpoints (resumo)
+Travelar-backend/
+├── src/
+│   ├── config/                
+│   │   ├── cloudinary.ts      
+│   │   ├── env.config.ts      
+│   │   └── passport.config.ts 
+│   ├── database/
+│   │   └── data-source.ts     
+│   ├── Imovel/
+│   │   ├── controller.ts      
+│   │   ├── entity.ts          
+│   │   ├── routes.ts          
+│   │   ├── service.ts         
+│   │   └── Testes/
+│   │       ├── integracao.test.ts
+│   │       ├── parametrizados.test.ts
+│   │       └── unitarios.test.ts
+│   ├── Reserva/               
+│   ├── Avaliacao/             
+│   ├── Usuario/               
+│   ├── UploadImagens/         
+│   │   └── routes.ts
+│   ├── swagger/               
+│   │   └── swagger.json
+│   ├── app.ts                 
+│   └── server.ts              
+├── coverage/                  
+├── docker-compose.yml         
+├── Dockerfile                 
+├── jest.config.js             
+└── package.json
+```
 
-POST /api/contas — Criar uma nova conta
-GET /api/contas — Listar todas as contas
-GET /api/contas/:id — Buscar conta por id
-PUT /api/contas/:id — Atualizar conta
-DELETE /api/contas/:id — Remover conta
-A documentação completa está disponível via Swagger.
+---
 
-## Preparar o ambiente (pré-requisitos)
+## **4. Endpoints da API**
 
-Git
-Node.js 18.x (recomendo usar nvm ou nvm-windows)
-Docker & Docker Compose (opcional, para rodar DB e app com um único comando)
-Clonar o repositório
-Clone o repositório:
-bash: 2 lines selected
+A API segue um padrão REST sólido, com autenticação via tokens JWT e documentação acessível em **/api-docs**.
+
+### **4.1. Imóveis (/imoveis)**
+
+Gerencia o catálogo principal da plataforma.
+
+| Método     | Rota          | Descrição                         |
+| ---------- | ------------- | --------------------------------- |
+| **POST**   | /imoveis      | Cria um novo imóvel               |
+| **GET**    | /imoveis      | Lista imóveis com filtros         |
+| **GET**    | /imoveis/{id} | Retorna detalhes de um imóvel     |
+| **PUT**    | /imoveis/{id} | Atualiza um imóvel (proprietário) |
+| **DELETE** | /imoveis/{id} | Remove imóvel                     |
+
+---
+
+### **4.2. Reservas (/reservas)**
+
+Responsável pelo fluxo de aluguel.
+
+| Método     | Rota           | Descrição                 |
+| ---------- | -------------- | ------------------------- |
+| **POST**   | /reservas      | Cria uma reserva          |
+| **GET**    | /reservas      | Lista reservas do usuário |
+| **PUT**    | /reservas/{id} | Altera datas ou status    |
+| **DELETE** | /reservas/{id} | Cancela reserva           |
+
+---
+
+### **4.3. Avaliações (/avaliacoes)**
+
+Sistema de feedback dos usuários.
+
+| Método   | Rota                    | Descrição                   |
+| -------- | ----------------------- | --------------------------- |
+| **POST** | /avaliacoes             | Cria uma avaliação          |
+| **GET**  | /avaliacoes/imovel/{id} | Lista avaliações por imóvel |
+
+---
+
+### **4.4. Upload (/upload)**
+
+| Método   | Rota    | Descrição                      |
+| -------- | ------- | ------------------------------ |
+| **POST** | /upload | Realiza upload para Cloudinary |
+
+---
+
+## **5. Estratégia de Testes**
+
+Os testes são executados pelo Jest e ficam dentro da pasta `Testes` de cada módulo.
+
+### **5.1. Tipos de Testes**
+
+* **Unitários**: Funções isoladas, sem banco
+* **Integração**: Fluxo completo rota → controller → service → database
+* **Parametrizados**: Executados com diferentes cenários de entrada
+
+### **5.2. Comandos de Teste**
+
+```bash
+npm test
+npm run test:coverage
+npm run test:watch
+```
+
+Relatórios são gerados na pasta **/coverage**.
+
+---
+
+## **6. Instalação e Execução (via Docker)**
+
+Este processo sobe tudo automaticamente:
+
+* Backend
+* PostgreSQL
+* PgAdmin
+* Swagger
+
+---
+
+### **6.1. Pré-requisitos**
+
+* Docker
+* Docker Compose
+* Git
+
+---
+
+### **6.2. Clonar o repositório**
+
+```bash
 git clone https://github.com/Travelar-Spot/Travelar-backend.git
 cd Travelar-backend
-Copie o arquivo de exemplo de ambiente e ajuste conforme necessário:
-bash: 3 lines selected
-copy .env.example .env    # Windows PowerShell
-# ou
-cp .env.example .env      # macOS / Linux
-Edite .env com as credenciais do banco de dados se precisar.
+```
 
-## Executando localmente (modo desenvolvimento)
+---
 
-Instale dependências:
-bash: 1 lines selected
-npm ci
-Inicie o banco de dados (local) ou via Docker Compose:
-Usando Docker Compose (inicia Postgres + pgAdmin):
-bash: 1 lines selected
+### **6.3. Criar arquivo `.env`**
+
+Crie o arquivo `.env` com o seguinte conteúdo:
+
+```env
+PORT=3000
+NODE_ENV=production
+
+DB_HOST=db
+DB_PORT=5432
+DB_DATABASE=travelar
+DB_USERNAME=developer
+DB_PASSWORD=password_exemplo
+
+JWT_SECRET=sua_chave_jwt
+```
+
+---
+
+### **6.4. Subir o projeto**
+
+#### **Construir e iniciar**
+
+```bash
+docker compose up --build
+```
+
+#### **Rodar em segundo plano**
+
+```bash
 docker compose up -d
-Ou garanta que o PostgreSQL esteja rodando e as credenciais em .env batam com a sua instância.
-Inicie a aplicação em modo desenvolvimento:
-bash: 1 lines selected
-npm run dev
-A aplicação deve iniciar e expor a API na porta configurada no .env (por padrão 3000 se não alterado).
+```
 
-Executando com Docker (recomendado para clonagem fácil)
-O repositório já contém Dockerfile e docker-compose.yml. Para iniciar tudo com um comando:
+#### **Parar**
 
-bash: 1 lines selected
-docker compose up --build -d
-Isso criará/rodará os serviços (aplicação, banco de dados, pgAdmin). Verifique os logs:
+```bash
+docker compose down
+```
 
-bash: 1 lines selected
-docker compose logs -f app
-Configuração do banco (TypeORM)
-O arquivo src/database/data-source.ts contém a configuração principal do TypeORM.
-As entidades (ex.: ContaUsuario) estão em src/Contas/entidade.ts.
-Se estiver usando Docker Compose, os valores do .env criados pelo docker-compose.yml serão usados.
-Testando o Swagger (documentação da API)
-Após iniciar a aplicação, a documentação Swagger estará disponível em:
+---
 
-plaintext: 1 lines selected
-http://localhost:3000/api-docs
-Documentação Swagger
+## **6.5. Acessos Importantes**
 
-Passos para testar:
+| Serviço        | URL                                                              |
+| -------------- | ---------------------------------------------------------------- |
+| **Backend**    | [http://localhost:3000](http://localhost:3000)                   |
+| **Swagger**    | [http://localhost:3000/api-docs](http://localhost:3000/api-docs) |
+| **PgAdmin**    | [http://localhost:5050](http://localhost:5050)                   |
+| **PostgreSQL** | localhost:5432                                                   |
 
-Abra o navegador e navegue até /api-docs.
-Explore os endpoints disponibilizados (POST/GET/PUT/DELETE para /api/contas).
-Use o Swagger UI para enviar requisições de teste diretamente (preencha bodies e parâmetros conforme especificado).
-Lint e formatação
-Prettier está configurado e há scripts npm:
+#### **Credenciais PgAdmin (padrão)**
 
-npm run lint — verifica formatação (Prettier)
-npm run lint:fix — aplica formatação
-ESLint está preparado no repositório e o workflow de CI foi atualizado para rodar ESLint em PRs. Para rodar localmente:
+```
+Email: admin@admin.com
+Senha: admin
+```
 
-bash: 2 lines selected
-npm run lint:eslint
-npm run lint:eslint:fix
+---
+
+## **6.6. Executar Migrations**
+
+### **Acessar o container**
+
+```bash
+docker exec -it travelar-backend sh
+```
+
+### **Rodar migrations**
+
+```bash
+npm run typeorm -- migration:run -d src/database/data-source.ts
+```
+
+---
+
+## **6.7. Logs**
+
+### Backend
+
+```bash
+docker logs -f travelar-backend
+```
+
+### Banco de Dados
+
+```bash
+docker logs -f travelar-db
+```
+
+---
+
+## **6.8. Testes Localmente (fora do Docker)**
+
+```bash
+npm test
+npm run test:watch
+npm run test:coverage
+```
+
