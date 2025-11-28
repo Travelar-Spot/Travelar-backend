@@ -1,8 +1,3 @@
-Aqui está um **README completo, extremamente organizado, padronizado e coerente**, seguindo toda a documentação fornecida.
-Você pode copiar e colar diretamente no repositório **Travelar-backend**.
-
----
-
 # **Travelar Backend**
 
 ## **1. Visão Geral do Projeto**
@@ -11,6 +6,8 @@ O **Travelar Backend** é o núcleo responsável por todas as regras de negócio
 Diferentemente da API de Autenticação, este serviço gerencia todo o domínio principal de hospedagem: **Imóveis, Reservas, Avaliações e Upload de Imagens**.
 
 O projeto foi desenvolvido com foco em **robustez, escalabilidade e testabilidade**, integrando serviços externos como **Cloudinary**, e utilizando **Docker** para garantir portabilidade e facilidade de execução.
+
+[Link da documentação do projeto Travelar](https://travelar-spot.github.io/Travelar-docs/)
 
 ### **Principais Responsabilidades**
 
